@@ -1,0 +1,22 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Only these Google accounts can record or change results.
+    // Replace the example address with your own, then deploy the rules.
+    function isOrganizer() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.token.email in [
+          'fanny.lin.2025@smu.edu.sg'
+        ];
+    }
+
+    // Everyone can read the live results. Only organizers can write.
+    match /{document=**} {
+      allow read: if true;
+      allow write: if isOrganizer();
+    }
+  }
+}
